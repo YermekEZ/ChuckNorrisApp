@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">GuessApp</string>
+    <string name="info">Get a joke</string>
+    <string name="joke">A joke will appear here!</string>
+</resources>
