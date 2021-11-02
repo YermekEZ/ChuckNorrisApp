@@ -5,6 +5,11 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.example.guessapp.model.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -29,37 +34,20 @@ class MainActivity : AppCompatActivity() {
         jokeText = findViewById(R.id.jokeTextView)
         generateJoke = findViewById(R.id.generateJokeButton)
 
-        loadJoke()
+        val model: MainViewModel by viewModels()
+
+        model.joke.observe(this, Observer<String>{joke->
+            jokeText.text = joke
+            }
+        )
+
+
+
+        //loadJoke()
 
         generateJoke.setOnClickListener {
-            loadJoke()
+            model.updateValue()
         }
     }
 
-    private fun loadJoke() {
-
-        val api = Retrofit.Builder()
-            .baseUrl(BASE_URL)
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(ApiInterface::class.java)
-
-        GlobalScope.launch(Dispatchers.IO){
-            try {
-                val response = api.getJokes().awaitResponse()
-                if(response.isSuccessful) {
-                    val data = response.body()!!
-
-                    withContext(Dispatchers.Main) {
-                        jokeText.text = data.value
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main){
-                    Toast.makeText(applicationContext, "Check your internet connection", Toast.LENGTH_LONG).show()
-                }
-            }
-
-        }
-    }
 }
